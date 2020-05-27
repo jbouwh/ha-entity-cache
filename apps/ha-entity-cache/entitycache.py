@@ -4,7 +4,7 @@ import appdaemon.plugins.hass.hassapi as hass
 import json
 import pathlib
 
-# Initialization test class for AppDaemon (homeassistant)
+# Initialization class for AppDaemon (homeassistant)
 class EntityCache(hass.Hass):
 
     def initialize(self, *args, **kwargs):
@@ -51,7 +51,6 @@ class EntityCache(hass.Hass):
             self.log(f"Cache file '{self.file}' could not be parsed. THis is no problem if this is the first time this application starts. Error: {e}", level='WARNING')
             raise e
 
-
     def terminate(self):
         for handle in self.handle:
             self.cancel_listen_state(handle)
@@ -67,6 +66,3 @@ class EntityCache(hass.Hass):
             self.log(f"Cache file updated '{entity}' = '{new}'", level='INFO')
         except Exception as e:
             self.log(f"Cache file '{self.file}' was not updated. Check your configuration.", level='ERROR')
-
-
-
