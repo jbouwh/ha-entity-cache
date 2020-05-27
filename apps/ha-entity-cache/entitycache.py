@@ -25,6 +25,7 @@ class EntityCache(hass.Hass):
             self.log(f'Read from file: {self.cachedstate}')
             # Recover the state from file
             for entity in self.cachedstate:
+                # Todo: replace set_state() with a better compatible: set_option(), set_text(), set_value() turn_on/off
                 self.set_state(entity, state=self.cachedstate[entity])
                 self.log(f"State recovered for entity {entity}: {self.cachedstate[entity]}")            
         except Exception as e:
