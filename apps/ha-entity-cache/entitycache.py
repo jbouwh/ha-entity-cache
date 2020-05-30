@@ -4,6 +4,7 @@ import appdaemon.plugins.hass.hassapi as hass
 import json
 import pathlib
 
+
 # Initialization class for AppDaemon (homeassistant)
 class EntityCache(hass.Hass):
 
@@ -54,7 +55,7 @@ class EntityCache(hass.Hass):
                 self.log(f"State recovered for entity '{entity}' skipped. type '{entity_type}' not suppported. "
                          "Type should be 'option', 'text', 'value' or 'switch'")
                 return
-        self.log(f"State recovered for entity '{entity}': {state}")            
+        self.log(f"State recovered for entity '{entity}': {state}")
 
     def terminate(self):
         for entity in self.handle:
@@ -70,4 +71,4 @@ class EntityCache(hass.Hass):
             self.filehandleout.close()
             self.log(f"Cache file updated '{entity}' = '{new}'", level='INFO')
         except Exception as e:
-            self.log(f"Cache file '{self.file}' was not updated. Check your configuration.", level='ERROR')
+            self.log(f"Cache file '{self.file}' was not updated. Check your configuration. Error: {e}", level='ERROR')
