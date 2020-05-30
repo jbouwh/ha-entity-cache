@@ -28,28 +28,33 @@ class EntityCache(hass.Hass):
             self.log(f'Read from file: {self.cachedstate}')
             # Recover the state from file
             for entity in self.cachedstate:
-                # Todo: replace set_state() with a better compatible: set_option(), set_text(), set_value() turn_on/off
-                entity_type = self.args['entities'][entity]
-                if entity_type:
-                    if entity_type == 'option':
-                        self.select_option(entity, self.cachedstate[entity])
-                    elif entity_type == 'text':
-                        self.set_text(entity, self.cachedstate[entity])
-                    elif entity_type == 'value':
-                        self.set_value(entity, self.cachedstate[entity])
-                    elif entity_type == 'switch':
-                        if self.cachedstate[entity] == 'on':
-                            self.turn_on(entity)
-                        elif self.cachedstate[entity] == 'off':
-                            self.turn_on(entity)
-                    else:
-                        # Use the generic method if everyting else fails
-                        self.set_state(entity, state=self.cachedstate[entity])
+                self._recover_state(entity=entity, state=self.cachedstate[entity],
+                                    entity_type=self.args['entities'][entity])
 
-                self.log(f"State recovered for entity '{entity}': {self.cachedstate[entity]}")            
         except Exception as e:
-            self.log(f"Cache file '{self.file}' could not be parsed. THis is no problem if this is the first time this application starts. Error: {e}", level='WARNING')
+            self.log(f"Cache file '{self.file}' could not be parsed. This is normal if this "
+                     f"is the first time this application starts. Error: {e}", level='WARNING')
             raise e
+
+    def _recover_state(self, entity, state, entity_type):
+        if entity_type:
+            if entity_type == 'option':
+                self.select_option(entity, state)
+            elif entity_type == 'text':
+                self.set_text(entity, state)
+            elif entity_type == 'value':
+                self.set_value(entity, state)
+            elif entity_type == 'switch':
+                if self.cachedstate[entity] == 'on':
+                    self.turn_on(entity)
+                elif self.cachedstate[entity] == 'off':
+                    self.turn_on(entity)
+            else:
+                # Recovery not supported if no valid type is supported
+                self.log(f"State recovered for entity '{entity}' skipped. type '{entity_type}' not suppported. "
+                         "Type should be 'option', 'text', 'value' or 'switch'")
+                return
+        self.log(f"State recovered for entity '{entity}': {state}")            
 
     def terminate(self):
         for entity in self.handle:
