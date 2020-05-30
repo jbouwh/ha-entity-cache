@@ -52,9 +52,9 @@ class EntityCache(hass.Hass):
             raise e
 
     def terminate(self):
-        for handle in self.handle:
-            self.cancel_listen_state(handle)
-            self.log("Caching was stopped.")
+        for entity in self.handle:
+            self.cancel_listen_state(self.handle[entity])
+            self.log(f"Caching for entity '{entity}' was stopped.")
 
     def callback(self, entity, attribute, old, new, kwargs):
         self.state[entity] = new

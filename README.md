@@ -20,7 +20,5 @@ Supported types are:
 * `value`: For caching numeric inputs
 * `switch`: for caching on / off controls
 
-When an other type is supplied the state value will be set. This is not tested and might effect icons or other attributes if not set correctly.
-
-## Installation (With AppDaemon add on on Home Assistant)
+## Installation (With AppDaemon add on on Home Assistant) or use HACS (Home Assistant Community store)
 Unpack the script files at `/config/appdaemon/`. The active script is 
