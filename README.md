@@ -20,7 +20,7 @@ ha-entity-cache:
 
 Place the entities for caching as a list under `entities:`.
 
-For each entity a _entity_name_: is created.
+For each entity a _entity_name_: section must exist.
 
 ### State caching
 Define the key `state_cache_type:` under the _{entity name}_ section.
