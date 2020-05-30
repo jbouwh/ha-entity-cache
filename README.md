@@ -9,16 +9,34 @@ ha-entity-cache:
 # The cache_file setting is optional and defaults to cache.json in the script current folder
   cache_file: /config/appdaemon/apps/ha-entity-cache/cache.json
   entities:
-    input_select.test: option
+    - input_select.test
+    - climate.rpi_cooling_fan_controller
+  input_select.test:
+    state_cache_type: option
+  climate.rpi_cooling_fan_controller: 
+    attributes:
+      - temperature
 ```
 
-Under `entities` place the entity names followed with the type of the entity that is to cached.
-Caching of attributes is _not_ supported with this version, but might be feature in future.
-Supported types are:
+Place the entities for caching as a list under `entities:`.
+
+For each entity a _entity_name_: is created.
+
+### State caching
+Define the key `state_cache_type:` under the _{entity name}_ section.
+
+Supported `state_cache_type` options are:
 * `option`: For caching input selects
 * `text`: For caching text inputs
 * `value`: For caching numeric inputs
 * `switch`: for caching on / off controls
 
+### Attribute caching
+Define the key `attributes:` under the _{entity name}_ section.
+The list of attribute names is a list under this key
+
 ## Installation (With AppDaemon add on on Home Assistant) or use HACS (Home Assistant Community store)
-Unpack the script files at `/config/appdaemon/`. The active script is 
+Unpack the script files at `/config/appdaemon/`. The active script is then located at `/config/appdaemon//apps/ha-entity-cache/entitycache.py'
+
+After startup, ha-entity-cache listens to updates of the values. That is the moment values are cached and restored after a restart of Home Assistant.
+At restore the type is checked. If a not valid type is entered, the value might not be restored, or not correct.
