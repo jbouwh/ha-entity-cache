@@ -93,7 +93,7 @@ class EntityCache(hass.Hass):
                 if state_updated:
                     self.set_state(entity, state=entity_state['state'], attributes=entity_state['attributes'])
 
-    def _turn_on_off(entity, state):
+    def _turn_on_off(self, entity, state):
         state_on = ['on', 'ON' , 'On' ,'true', 'TRUE', 'True', '1']
         if state in state_on:
             self.turn_on(entity)
