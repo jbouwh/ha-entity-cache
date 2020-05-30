@@ -67,8 +67,8 @@ class EntityCache(hass.Hass):
         # Process state cache entities
         if 'state_cache_type' in self.args[entity]:
             if self.args[entity]['state_cache_type'] in state_recover_functions:
-                self.callback[entity]['state_recover_function'] = state_recover_functions[self.args[entity]
-                                                                                            ['state_cache_type']]
+                self.callback[entity]['state_recover_function'] = \
+                    state_recover_functions[self.args[entity]['state_cache_type']]
                 self.callback[entity]['callback_handle'] = self.listen_state(self.state_callback, entity)
                 self.log(f"Cache enabled for state entity: {entity}")
         # Process attributes
@@ -96,10 +96,10 @@ class EntityCache(hass.Hass):
                 entity_state['attributes'][attribute] = self.cachedstate['attributes'][entity][attribute]
                 state_updated = True
                 self.log(f"State recovered for attribute '{attribute}' of entity '{entity}': "
-                            f"{self.cachedstate['attributes'][entity][attribute]}")
+                         f"{self.cachedstate['attributes'][entity][attribute]}")
             else:
                 self.log(f"Ignoring previous state for attribute '{attribute}' of entity '{entity}': "
-                            f"{self.cachedstate['attributes'][entity][attribute]}")
+                         f"{self.cachedstate['attributes'][entity][attribute]}")
         # Update all recovered attributes using one call
         if state_updated:
             self.set_state(entity, state=entity_state['state'], attributes=entity_state['attributes'])
