@@ -20,33 +20,10 @@ class EntityCache(hass.Hass):
         self.mainpath = pathlib.Path(__file__).parent.absolute()
         self.file = self.args['cache_file'] if 'cache_file' in self.args else f'{self.mainpath}/cache.json'
 
-        # Set state recover call back functions for each state type
-        state_recover_functions = {
-            'option': self.select_option,
-            'text': self.set_textvalue,
-            'value': self.set_value,
-            'switch': self._turn_on_off
-            }
         # Process attributes
         if 'entities' in self.args:
             for entity in self.args['entities']:
-                self.callback[entity] = {}
-                # call back handles:
-                # main state: self.callback[entity]['callback_handle'] 
-                # attributes: self.callback[entity]['attribute_callback_handle'][attribute]
-                # Process state cache entities
-                if 'state_cache_type' in self.args[entity]:
-                    if self.args[entity]['state_cache_type'] in state_recover_functions:
-                        self.callback[entity]['state_recover_function'] = state_recover_functions[self.args[entity]['state_cache_type']]
-                        self.callback[entity]['callback_handle'] = self.listen_state(self.state_callback, entity)
-                        self.log(f"Cache enabled for state entity: {entity}")
-                # Process attributes
-                if 'attributes' in self.args[entity]:
-                    self.callback[entity]['attribute_callback_handle'] = {}
-                    for attribute in self.args[entity]['attributes']:
-                        self.callback[entity]['attribute_callback_handle'][attribute] = \
-                            self.listen_state(self.state_callback, entity, attribute=attribute)
-                        self.log(f"Cache enabled for attribute '{attribute}' of entity: {entity}")
+                self._process_entity_config(entity)
         else:
             self.log("No entries or attributes to cache found in config!", level='WARNING')
             return
@@ -63,38 +40,72 @@ class EntityCache(hass.Hass):
             self.cachedstate = {}
             self.log(f"Cache file '{self.file}' could not be parsed. This is normal if this "
                      f"is the first time this application starts. Error: {e}", level='WARNING')
-        
+
         # Recover the states from file
         # self.cachedstate['states'][entitiy] = state
         # self.cachedstate['attributes'][entity][attribute] = attribute_state
         if self.cachedstate:
             for entity in self.cachedstate['states']:
-                if 'callback_handle' in self.callback[entity]:
-                    # Recover state: self.callback[entity]['state_recover_function'] holds the correct set_state function
-                    self.callback[entity]['state_recover_function'](entity, self.cachedstate['states'][entity])
-                    self.log(f"State recovered for entity '{entity}': {self.cachedstate['states'][entity]}")
-                else:
-                    self.log(f"Ignoring previous state for entity '{entity}': {self.cachedstate['states'][entity]}")
+                # Recover entity state
+                self._recover_entity_state(entity)
             for entity in self.cachedstate['attributes']:
                 # Recover attribute state
-                entity_state = self.get_state(entity, attribute="all")
-                state_updated = False
-                for attribute in self.cachedstate['attributes'][entity]:
-                    if attribute in self.callback[entity]['attribute_callback_handle']:
-                        # Get complete attribute state befor updating the attribute
-                        entity_state['attributes'][attribute] = self.cachedstate['attributes'][entity][attribute]
-                        state_updated = True
-                        self.log(f"State recovered for attribute '{attribute}' of entity '{entity}': "
-                                 f"{self.cachedstate['attributes'][entity][attribute]}")
-                    else:
-                        self.log(f"Ignoring previous state for attribute '{attribute}' of entity '{entity}': "
-                                 f"{self.cachedstate['attributes'][entity][attribute]}")
-                # Update all recovered attributes using one call
-                if state_updated:
-                    self.set_state(entity, state=entity_state['state'], attributes=entity_state['attributes'])
+                self._recover_attribute_state(entity)
+
+    def _process_entity_config(self, entity):
+        # Set state recover call back functions for each state type
+        state_recover_functions = {
+            'option': self.select_option,
+            'text': self.set_textvalue,
+            'value': self.set_value,
+            'switch': self._turn_on_off
+            }
+        self.callback[entity] = {}
+        # call back handles:
+        # main state: self.callback[entity]['callback_handle']
+        # attributes: self.callback[entity]['attribute_callback_handle'][attribute]
+        # Process state cache entities
+        if 'state_cache_type' in self.args[entity]:
+            if self.args[entity]['state_cache_type'] in state_recover_functions:
+                self.callback[entity]['state_recover_function'] = state_recover_functions[self.args[entity]
+                                                                                            ['state_cache_type']]
+                self.callback[entity]['callback_handle'] = self.listen_state(self.state_callback, entity)
+                self.log(f"Cache enabled for state entity: {entity}")
+        # Process attributes
+        if 'attributes' in self.args[entity]:
+            self.callback[entity]['attribute_callback_handle'] = {}
+            for attribute in self.args[entity]['attributes']:
+                self.callback[entity]['attribute_callback_handle'][attribute] = \
+                    self.listen_state(self.state_callback, entity, attribute=attribute)
+                self.log(f"Cache enabled for attribute '{attribute}' of entity: {entity}")
+
+    def _recover_entity_state(self, entity):
+        if 'callback_handle' in self.callback[entity]:
+            # Recover state: self.callback[entity]['state_recover_function'] holds the correct set_state function
+            self.callback[entity]['state_recover_function'](entity, self.cachedstate['states'][entity])
+            self.log(f"State recovered for entity '{entity}': {self.cachedstate['states'][entity]}")
+        else:
+            self.log(f"Ignoring previous state for entity '{entity}': {self.cachedstate['states'][entity]}")
+
+    def _recover_attribute_state(self, entity):
+        entity_state = self.get_state(entity, attribute="all")
+        state_updated = False
+        for attribute in self.cachedstate['attributes'][entity]:
+            if attribute in self.callback[entity]['attribute_callback_handle']:
+                # Get complete attribute state befor updating the attribute
+                entity_state['attributes'][attribute] = self.cachedstate['attributes'][entity][attribute]
+                state_updated = True
+                self.log(f"State recovered for attribute '{attribute}' of entity '{entity}': "
+                            f"{self.cachedstate['attributes'][entity][attribute]}")
+            else:
+                self.log(f"Ignoring previous state for attribute '{attribute}' of entity '{entity}': "
+                            f"{self.cachedstate['attributes'][entity][attribute]}")
+        # Update all recovered attributes using one call
+        if state_updated:
+            self.set_state(entity, state=entity_state['state'], attributes=entity_state['attributes'])
 
     def _turn_on_off(self, entity, state):
-        state_on = ['on', 'ON' , 'On' ,'true', 'TRUE', 'True', '1']
+        state_on = ['on', 'ON', 'On', 'true', 'TRUE', 'True', '1']
         if state in state_on:
             self.turn_on(entity)
         else:
@@ -103,7 +114,7 @@ class EntityCache(hass.Hass):
     def terminate(self):
         # close listen_state handles
         for entity in self.callback:
-            # main state: self.callback[entity]['callback_handle'] 
+            # main state: self.callback[entity]['callback_handle']
             if 'callback_handle' in self.callback[entity]:
                 self.cancel_listen_state(self.callback[entity]['callback_handle'])
                 self.log(f"Caching for entity '{entity}' was stopped.")
