@@ -1,4 +1,6 @@
 # ha-entitiy-cache
+![HACS Validate](https://github.com/jbouwh/ha-entitiy-cache/workflows/HACS%20Validate/badge.svg)
+![ha-entity-cache](https://github.com/jbouwh/ha-entitiy-cache/workflows/ha-entity-cache/badge.svg)
 AppDaemon based entity cache application for Home Assistant
 
 ## Example config (/conf/appdaemon/apps/apps.yaml)
