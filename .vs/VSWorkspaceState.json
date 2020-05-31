@@ -1,9 +1,11 @@
 {
   "ExpandedNodes": [
     "",
+    "\\.github",
+    "\\.github\\workflows",
     "\\apps",
-    "\\apps\\ha-entity-cache"
+    "\\apps\\ha-entity-cache",
+    "\\tests"
   ],
-  "SelectedNode": "\\apps\\ha-entity-cache\\entitycache.py",
   "PreviewInSolutionExplorer": false
 }
