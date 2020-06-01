@@ -3,7 +3,7 @@
 ![ha-entity-cache](https://github.com/jbouwh/ha-entity-cache/workflows/ha-entity-cache/badge.svg)
 AppDaemon based entity cache application for Home Assistant.
 
-*IMPORTANT NOTE. Native Home Assistant already caches content. You will not this add of if you did not specify an initial value in the configuration.*
+*IMPORTANT NOTE. Native Home Assistant already caches content. You will not need this add-on if you did not specify an initial value in your Home Assistant configuration!*
 
 ## Example config (/conf/appdaemon/apps/apps.yaml)
 ```yaml
