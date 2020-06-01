@@ -1,7 +1,9 @@
 # ha-entity-cache
 ![HACS Validate](https://github.com/jbouwh/ha-entity-cache/workflows/HACS%20Validate/badge.svg)
 ![ha-entity-cache](https://github.com/jbouwh/ha-entity-cache/workflows/ha-entity-cache/badge.svg)
-AppDaemon based entity cache application for Home Assistant
+AppDaemon based entity cache application for Home Assistant.
+
+*IMPORTANT NOTE. Native Home Assistant already caches content. You will not this add of if you did not specify an initial value in the configuration.*
 
 ## Example config (/conf/appdaemon/apps/apps.yaml)
 ```yaml
