@@ -15,5 +15,4 @@ jobs:
       - name: HACS Action
         uses: "hacs/action@main"
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           category: "appdaemon"
