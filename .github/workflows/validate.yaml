@@ -11,10 +11,14 @@ jobs:
     runs-on: "ubuntu-latest"
     steps:
       - uses: "actions/checkout@v2"
-      - name: HACS validation
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CATEGORY: "appdaemon"
       - uses: "home-assistant/actions/hassfest@master"
-      - name: Hassfest validation
-        uses: "hacs/integration/action@main"
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CATEGORY: "appdaemon"
+      - uses: "hacs/integration/action@main"
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CATEGORY: "appdaemon"
