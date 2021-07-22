@@ -12,6 +12,8 @@ jobs:
     steps:
       - uses: "actions/checkout@v2"
       - name: HACS validation
+      - uses: "home-assistant/actions/hassfest@master"
+      - name: Hassfest validation
         uses: "hacs/integration/action@main"
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
