@@ -8,7 +8,7 @@ import pathlib
 # Initialization class for AppDaemon (homeassistant)
 class EntityCache(hass.Hass):
 
-    def initialize(self, *args, **kwargs):
+    def initialize(self):
         self.log("Entity cache started")
         self.callback = {}
         self.state = {
